@@ -41,7 +41,22 @@ function App() {
                 setCurrentUser(data.user);
                 getJobSources();
             } else {
-                setCurrentUser({});
+                const response = await fetch(backend_base_url + "/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: "anonymousUser",
+                        password: "anonymousUser123",
+                    }),
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    getJobSources();
+                    setCurrentUser(data.user);
+                    localStorage.setItem("token", data.token);
+                } else {
+                    setMessage("bad login");
+                }
             }
         })();
     }, []);
