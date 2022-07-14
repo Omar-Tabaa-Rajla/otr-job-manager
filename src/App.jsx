@@ -75,6 +75,7 @@ function App() {
     return (
         <div className="App">
             <h1>EJT Job Manager</h1>
+
             {userIsLoggedIn() ? (
                 <>
                     <p>There are {jobSources.length} job sources:</p>
