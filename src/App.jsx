@@ -16,7 +16,7 @@ function App() {
     const [message, setMessage] = useState("");
 
     const userIsLoggedIn = () => {
-        return Object.keys(currentUser).length > 0;
+        return currentUser.username !== "anonymousUser";
     };
 
     const getJobSources = () => {
@@ -46,7 +46,7 @@ function App() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         username: "anonymousUser",
-                        password: "anonymousUser123",
+                        password: "anonymous123",
                     }),
                 });
                 if (response.ok) {
@@ -63,7 +63,7 @@ function App() {
 
     const handleLogoutButton = () => {
         localStorage.removeItem("token", "");
-        setCurrentUser({});
+        setCurrentUser({ username: "anonymousUser" });
     };
 
     const handleLoginButton = async (e) => {
@@ -90,6 +90,14 @@ function App() {
     return (
         <div className="App">
             <h1>EJT Job Manager</h1>
+            <div className="loggedInInfo">
+                {userIsLoggedIn() && (
+                    <div>
+                        Logged in: {currentUser.firstName}{" "}
+                        {currentUser.lastName}
+                    </div>
+                )}
+            </div>
 
             {userIsLoggedIn() ? (
                 <>
