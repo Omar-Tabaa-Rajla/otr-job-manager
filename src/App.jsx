@@ -1,6 +1,13 @@
 import "./App.scss";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { NavLink, Route, Routes } from "react-router-dom";
+import PageWelcome from "./pages/PageWelcome";
+import PageJobSources from "./pages/PageJobSources";
+import PageJobApplications from "./pages/PageJobApplications";
+import PageCv from "./pages/PageCv";
+import PageLogin from "./pages/PageLogin";
+import PageRegister from "./pages/PageRegister";
 
 const backend_base_url = "http://localhost:3044";
 //import.meta.env.VITE_BACKEND_URL;
@@ -98,6 +105,28 @@ function App() {
     return (
         <div className="App">
             <h1>EJT Job Manager</h1>
+
+            <nav>
+                <NavLink to="/welcome">Welcome</NavLink>
+                <NavLink to="/job-sources">Job Sources</NavLink>
+                <NavLink to="/job-applications">Job Applications</NavLink>
+                <NavLink to="/cv">CV</NavLink>
+                <NavLink to="/login">Login</NavLink>
+                <NavLink to="/register">Register</NavLink>
+            </nav>
+
+            <Routes>
+                <Route path="/welcome" element={<PageWelcome />} />
+                <Route path="/job-sources" element={<PageJobSources />} />
+                <Route
+                    path="/job-applications"
+                    element={<PageJobApplications />}
+                />
+                <Route path="/cv" element={<PageCv />} />
+                <Route path="/login" element={<PageLogin />} />
+                <Route path="/register" element={<PageRegister />} />
+            </Routes>
+
             <div className="loggedInInfo">
                 {userIsLoggedIn() && (
                     <div>
