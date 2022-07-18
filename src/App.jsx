@@ -71,7 +71,16 @@ function App() {
                     setCurrentUser(data.user);
                     localStorage.setItem("token", data.token);
                 } else {
-                    setMessage("bad login 111");
+                    setMessage("bad login");
+                    setTimeout(() => {
+                        setMessage("");
+                    }, 2000);
+
+                    {
+                        message !== "" && (
+                            <div className="siteMessage">{message}</div>
+                        );
+                    }
                 }
             }
         })();
