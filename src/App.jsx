@@ -1,23 +1,22 @@
-import "./App.scss";
 import { useState, useEffect } from "react";
+import "./App.scss";
 import axios from "axios";
+import { PageWelcome } from "./pages/PageWelcome";
+import { PageJobSources } from "./pages/PageJobSources";
+import { PageJobApplications } from "./pages/PageJobApplications";
+import { PageCv } from "./pages/PageCv";
+import { PageLogin } from "./pages/PageLogin";
+import { PageRegister } from "./pages/PageRegister";
 import { NavLink, Route, Routes } from "react-router-dom";
-import PageWelcome from "./pages/PageWelcome";
-import PageJobSources from "./pages/PageJobSources";
-import PageJobApplications from "./pages/PageJobApplications";
-import PageCv from "./pages/PageCv";
-import PageLogin from "./pages/PageLogin";
-import PageRegister from "./pages/PageRegister";
 
 const backend_base_url = "http://localhost:3044";
-//import.meta.env.VITE_BACKEND_URL;
-//console.log(backend_base_url);
-//
-//"http://localhost:3044/job-sources";
 
 function App() {
     const [jobSources, setJobSources] = useState([]);
-    const [currentUser, setCurrentUser] = useState({});
+    const [currentUser, setCurrentUser] = useState({
+        username: "anonymousUser",
+        accessGroups: ["loggedOutUsers"],
+    });
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -26,12 +25,14 @@ function App() {
         return currentUser.username !== "anonymousUser";
     };
 
-    const currentUserIsInAccessGroup = (accessGroup) => {
-        if (currentUser.accessGroups) {
-            return currentUser.accessGroups.includes(accessGroup);
-        } else {
-            return false;
-        }
+    const currentUserIsInAccessGroups = (accessGroups) => {
+        let rb = false;
+        accessGroups.forEach((accessGroup) => {
+            if (currentUser.accessGroups.includes(accessGroup)) {
+                rb = true;
+            }
+        });
+        return rb;
     };
 
     const getJobSources = () => {
@@ -61,7 +62,7 @@ function App() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         username: "anonymousUser",
-                        password: "anonymous123",
+                        password: "anonymousUser123",
                     }),
                 });
                 if (response.ok) {
@@ -70,16 +71,11 @@ function App() {
                     setCurrentUser(data.user);
                     localStorage.setItem("token", data.token);
                 } else {
-                    setMessage("bad login");
+                    setMessage("bad login 111");
                 }
             }
         })();
     }, []);
-
-    const handleLogoutButton = () => {
-        localStorage.removeItem("token", "");
-        setCurrentUser({ username: "anonymousUser" });
-    };
 
     const handleLoginButton = async (e) => {
         e.preventDefault();
@@ -88,99 +84,118 @@ function App() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
         });
-
         setUsername("");
         setPassword("");
-
         if (response.ok) {
             const data = await response.json();
             getJobSources();
             setCurrentUser(data.user);
             localStorage.setItem("token", data.token);
         } else {
-            setMessage("bad login! LOSER");
+            setMessage("bad login");
+            setTimeout(() => {
+                setMessage("");
+            }, 3000);
         }
+    };
+
+    const handleLogoutButton = () => {
+        localStorage.removeItem("token");
+        setCurrentUser({
+            username: "anonymousUser",
+            accessGroups: ["loggedOutUsers"],
+        });
     };
 
     return (
         <div className="App">
-            <h1>EJT Job Manager</h1>
-
-            <nav>
-                <NavLink to="/welcome">Welcome</NavLink>
-                <NavLink to="/job-sources">Job Sources</NavLink>
-                <NavLink to="/job-applications">Job Applications</NavLink>
-                <NavLink to="/cv">CV</NavLink>
-                <NavLink to="/login">Login</NavLink>
-                <NavLink to="/register">Register</NavLink>
-            </nav>
-
-            <Routes>
-                <Route path="/welcome" element={<PageWelcome />} />
-                <Route path="/job-sources" element={<PageJobSources />} />
-                <Route
-                    path="/job-applications"
-                    element={<PageJobApplications />}
-                />
-                <Route path="/cv" element={<PageCv />} />
-                <Route path="/login" element={<PageLogin />} />
-                <Route path="/register" element={<PageRegister />} />
-            </Routes>
-
-            <div className="loggedInInfo">
+            <>
+                <h1>EJ2 Job Manager</h1>
                 {userIsLoggedIn() && (
-                    <div>
-                        Logged in: {currentUser.firstName}{" "}
-                        {currentUser.lastName}
+                    <div className="loggedInInfo">
+                        {currentUser.firstName} {currentUser.lastName}{" "}
+                        <button className="logout" onClick={handleLogoutButton}>
+                            Logout
+                        </button>
                     </div>
                 )}
-            </div>
-            <div className="info">
-                {currentUserIsInAccessGroup("administrators") && (
-                    <div>info for administrators</div>
-                )}
-                {currentUserIsInAccessGroup("jobSeekers") && (
-                    <div>new job information for job seekers</div>
-                )}
-            </div>
+                {message !== "" && <div className="siteMessage">{message}</div>}
+                <nav>
+                    <NavLink to="/welcome">Welcome</NavLink>
 
-            {userIsLoggedIn() ? (
-                <>
-                    <p>There are {jobSources.length} job sources:</p>
-                    <ul>
-                        {jobSources.map((jobSource, i) => {
-                            return <li key={i}>{jobSource.name}</li>;
-                        })}
-                    </ul>
-                    <button className="logout" onClick={handleLogoutButton}>
-                        Logout
-                    </button>
-                </>
-            ) : (
-                <form className="login">
-                    <div className="row">
-                        username:{" "}
-                        <input
-                            onChange={(e) => setUsername(e.target.value)}
-                            value={username}
-                            type="text"
-                        />
-                    </div>
-                    <div className="row">
-                        password:{" "}
-                        <input
-                            onChange={(e) => setPassword(e.target.value)}
-                            value={password}
-                            type="password"
-                        />
-                    </div>
+                    {currentUserIsInAccessGroups([
+                        "jobSeekers",
+                        "administrators",
+                    ]) && <NavLink to="/job-sources">Job Sources</NavLink>}
 
-                    <div className="row">
-                        <button onClick={handleLoginButton}>Login</button>
-                    </div>
-                    <div className="row">{message}</div>
-                </form>
-            )}
+                    {currentUserIsInAccessGroups(["administrators"]) && (
+                        <NavLink to="/job-applications">
+                            Job Applications
+                        </NavLink>
+                    )}
+
+                    {currentUserIsInAccessGroups([
+                        "companies",
+                        "administrators",
+                    ]) && <NavLink to="/cv">CV</NavLink>}
+
+                    {currentUserIsInAccessGroups(["loggedOutUsers"]) && (
+                        <>
+                            <NavLink to="/login">Login</NavLink>
+                            <NavLink to="/register">Register</NavLink>
+                        </>
+                    )}
+                </nav>
+                <Routes>
+                    <Route path="/welcome" element={<PageWelcome />} />
+                    {currentUserIsInAccessGroups([
+                        "jobSeekers",
+                        "administrators",
+                    ]) && (
+                        <Route
+                            path="/job-sources"
+                            element={
+                                <PageJobSources
+                                    jobSources={jobSources}
+                                    handleLogoutButton={handleLogoutButton}
+                                />
+                            }
+                        />
+                    )}
+                    k
+                    {currentUserIsInAccessGroups(["administrators"]) && (
+                        <Route
+                            path="/job-applications"
+                            element={<PageJobApplications />}
+                        />
+                    )}
+                    {currentUserIsInAccessGroups([
+                        "companies",
+                        "administrators",
+                    ]) && <Route path="/cv" element={<PageCv />} />}
+                    <Route
+                        path="/login"
+                        element={
+                            <PageLogin
+                                message={message}
+                                jobSources={jobSources}
+                                userIsLoggedIn={userIsLoggedIn}
+                                currentUser={currentUser}
+                                currentUserIsInAccessGroups={
+                                    currentUserIsInAccessGroups
+                                }
+                                handleLogoutButton={handleLogoutButton}
+                                handleLoginButton={handleLoginButton}
+                                username={username}
+                                password={password}
+                                setUsername={setUsername}
+                                setPassword={setPassword}
+                            />
+                        }
+                    />
+                    <Route path="/register" element={<PageRegister />} />
+                </Routes>
+            </>
         </div>
     );
 }

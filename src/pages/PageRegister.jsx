@@ -1,5 +1,7 @@
-const PageRegister = () => {
-    return <p>PageRegister</p>;
+export const PageRegister = () => {
+    return (
+        <>
+            <p>This is the Register page.</p>
+        </>
+    );
 };
-
-export default PageRegister;

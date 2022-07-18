@@ -1,5 +1,7 @@
-const PageWelcome = () => {
-    return <p>PageWelcome</p>;
+export const PageWelcome = () => {
+    return (
+        <>
+            <p>Welcome to this site.</p>
+        </>
+    );
 };
-
-export default PageWelcome;

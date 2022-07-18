@@ -1,5 +1,7 @@
-const PageJobApplications = () => {
-    return <p>PageJobApplications</p>;
+export const PageJobApplications = () => {
+    return (
+        <>
+            <p>This is the Job Applications page.</p>
+        </>
+    );
 };
-
-export default PageJobApplications;

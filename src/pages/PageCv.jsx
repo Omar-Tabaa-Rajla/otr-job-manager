@@ -1,5 +1,7 @@
-const PageCv = () => {
-    return <p>PageCv</p>;
+export const PageCv = () => {
+    return (
+        <>
+            <p>This is the CV page.</p>
+        </>
+    );
 };
-
-export default PageCv;
