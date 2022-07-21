@@ -62,7 +62,7 @@ function App() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         username: "anonymousUser",
-                        password: "anonymousUser123",
+                        password: "anonymous123",
                     }),
                 });
                 if (response.ok) {
